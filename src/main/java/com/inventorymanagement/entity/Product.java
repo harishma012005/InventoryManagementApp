@@ -1,4 +1,3 @@
-
 package com.inventorymanagement.entity;
 
 import java.math.BigDecimal;
@@ -9,42 +8,77 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.*;
+
 @Entity
-@Table(name = "products")
+@Table(
+	    name = "products",
+	    uniqueConstraints = @UniqueConstraint(
+	        columnNames = {"product_name", "supplier_id", "category_id"}
+	    )
+	)
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy =
+            GenerationType.IDENTITY)
+
     @Column(name = "product_id")
     private Integer productId;
+
+    @NotBlank(message =
+            "Product Name Cannot Be Empty")
 
     @Column(name = "product_name")
     private String productName;
 
-    private String category;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+
+    private Category category;
+
+    @NotNull(message =
+            "Quantity Cannot Be Null")
+
+    @Min(value = 0,
+            message =
+            "Quantity Cannot Be Negative")
 
     private Integer quantity;
 
+    @NotNull(message =
+            "Price Cannot Be Null")
+
+    @Positive(message =
+            "Price Must Be Greater Than Zero")
+
     private BigDecimal price;
 
-    private String supplier;
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+
+    private Supplier supplier;
 
     @CreationTimestamp
     @Column(name = "created_at",
             updatable = false)
+
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
+
     private LocalDateTime updatedAt;
 
-    // Getter and Setter Methods
+    // Getters and Setters
 
     public Integer getProductId() {
         return productId;
     }
 
-    public void setProductId(Integer productId) {
+    public void setProductId(
+            Integer productId) {
+
         this.productId = productId;
     }
 
@@ -52,15 +86,19 @@ public class Product {
         return productName;
     }
 
-    public void setProductName(String productName) {
+    public void setProductName(
+            String productName) {
+
         this.productName = productName;
     }
 
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(
+            Category category) {
+
         this.category = category;
     }
 
@@ -68,7 +106,9 @@ public class Product {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(
+            Integer quantity) {
+
         this.quantity = quantity;
     }
 
@@ -76,15 +116,19 @@ public class Product {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(
+            BigDecimal price) {
+
         this.price = price;
     }
 
-    public String getSupplier() {
+    public Supplier getSupplier() {
         return supplier;
     }
 
-    public void setSupplier(String supplier) {
+    public void setSupplier(
+            Supplier supplier) {
+
         this.supplier = supplier;
     }
 
@@ -92,7 +136,9 @@ public class Product {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(
+            LocalDateTime createdAt) {
+
         this.createdAt = createdAt;
     }
 
@@ -100,7 +146,9 @@ public class Product {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(
+            LocalDateTime updatedAt) {
+
         this.updatedAt = updatedAt;
     }
 }

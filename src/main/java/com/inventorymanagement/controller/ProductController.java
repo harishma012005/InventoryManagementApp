@@ -1,5 +1,6 @@
 package com.inventorymanagement.controller;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.inventorymanagement.entity.Product;
 import com.inventorymanagement.service.ProductService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/products")
@@ -20,18 +23,17 @@ public class ProductController {
     // Add Product
     @PostMapping
     public Map<String, Object> saveProduct(
+            @Valid
             @RequestBody Product product) {
 
         Product savedProduct =
-                productService.saveProduct(product);
+                productService.saveProduct(
+                product);
 
         Map<String, Object> response =
                 new HashMap<>();
 
-        response.put(
-                "status",
-                201);
-
+        response.put("status", 201);
         response.put(
                 "message",
                 "Product Saved Successfully");
@@ -43,14 +45,14 @@ public class ProductController {
         return response;
     }
 
-    // View All Products
+    // Get All Products
     @GetMapping
     public List<Product> getAllProducts() {
 
         return productService.getAllProducts();
     }
 
-    // View Product By ID
+    // Get Product By ID
     @GetMapping("/{id}")
     public Product getProductById(
             @PathVariable Integer id) {
@@ -58,10 +60,90 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
+    // Search By Product Name
+    @GetMapping("/search/{productName}")
+    public List<Product>
+    searchProductsByName(
+            @PathVariable String productName) {
+
+        return productService
+                .searchProductsByName(
+                productName);
+    }
+
+    // Search By Category
+    @GetMapping("/search/category/{category}")
+    public List<Product>
+    searchProductsByCategory(
+            @PathVariable String category) {
+
+        return productService
+                .searchProductsByCategory(
+                category);
+    }
+
+    // Search By Supplier Name
+    @GetMapping("/search/supplier/{supplierName}")
+    public List<Product>
+    searchProductsBySupplierName(
+            @PathVariable String supplierName) {
+
+        return productService
+                .searchProductsBySupplierName(
+                supplierName);
+    }
+
+    // Filter By Supplier ID
+    @GetMapping("/supplier/{supplierId}")
+    public List<Product>
+    getProductsBySupplierId(
+            @PathVariable Integer supplierId) {
+
+        return productService
+                .getProductsBySupplierId(
+                supplierId);
+    }
+
+    // Filter By Category
+    @GetMapping("/category/{category}")
+    public List<Product>
+    getProductsByCategory(
+            @PathVariable String category) {
+
+        return productService
+                .getProductsByCategory(
+                category);
+    }
+
+    // Filter By Price
+    @GetMapping("/price/{price}")
+    public List<Product>
+    getProductsByPrice(
+            @PathVariable BigDecimal price) {
+
+        return productService
+                .getProductsByPrice(
+                price);
+    }
+
+    // Filter By Quantity
+    @GetMapping("/quantity/{quantity}")
+    public List<Product>
+    getProductsByQuantity(
+            @PathVariable Integer quantity) {
+
+        return productService
+                .getProductsByQuantity(
+                quantity);
+    }
+
     // Update Product
     @PutMapping("/{id}")
     public Map<String, Object> updateProduct(
+    		
             @PathVariable Integer id,
+            @Valid
+            
             @RequestBody Product product) {
 
         Product updatedProduct =
@@ -71,9 +153,7 @@ public class ProductController {
         Map<String, Object> response =
                 new HashMap<>();
 
-        response.put(
-                "status",
-                200);
+        response.put("status", 200);
 
         response.put(
                 "message",
@@ -96,9 +176,7 @@ public class ProductController {
         Map<String, Object> response =
                 new HashMap<>();
 
-        response.put(
-                "status",
-                200);
+        response.put("status", 200);
 
         response.put(
                 "message",
@@ -109,16 +187,15 @@ public class ProductController {
 
     // Delete All Products
     @DeleteMapping
-    public Map<String, Object> deleteAllProducts() {
+    public Map<String, Object>
+    deleteAllProducts() {
 
         productService.deleteAllProducts();
 
         Map<String, Object> response =
                 new HashMap<>();
 
-        response.put(
-                "status",
-                200);
+        response.put("status", 200);
 
         response.put(
                 "message",
