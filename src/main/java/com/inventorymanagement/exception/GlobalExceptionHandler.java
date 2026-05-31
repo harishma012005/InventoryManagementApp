@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class GlobalExceptionHandler {
 
     // Resource Not Found Exception
+	
 
     @ExceptionHandler(
             ResourceNotFoundException.class)
@@ -63,5 +64,30 @@ public class GlobalExceptionHandler {
         });
 
         return errors;
+    }
+ // Runtime Exception
+
+    @ExceptionHandler(
+            RuntimeException.class)
+
+    @ResponseStatus(
+            HttpStatus.BAD_REQUEST)
+
+    public Map<String, Object>
+    handleRuntimeException(
+            RuntimeException ex) {
+
+        Map<String, Object> error =
+                new HashMap<>();
+
+        error.put(
+                "status",
+                400);
+
+        error.put(
+                "message",
+                ex.getMessage());
+
+        return error;
     }
 }

@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.inventorymanagement.entity.Product;
 import com.inventorymanagement.entity.Supplier;
 import com.inventorymanagement.exception.ResourceNotFoundException;
+import com.inventorymanagement.repository.ProductRepository;
 import com.inventorymanagement.repository.SupplierRepository;
 import com.inventorymanagement.service.SupplierService;
 
@@ -16,6 +18,9 @@ public class SupplierServiceImpl
 
     @Autowired
     private SupplierRepository supplierRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     // Save Supplier
     @Override
@@ -95,5 +100,30 @@ public class SupplierServiceImpl
     public void deleteAllSuppliers() {
 
         supplierRepository.deleteAll();
+    }
+
+    // Get Total Stock By Supplier
+    @Override
+    public Integer getTotalStockBySupplier(
+            Integer supplierId) {
+
+       
+                supplierRepository.findById(
+                        supplierId)
+
+                .orElseThrow(() ->
+                new ResourceNotFoundException(
+                "Supplier Not Found With ID : "
+                + supplierId));
+
+        List<Product> products =
+                productRepository
+                .findBySupplier_SupplierId(
+                        supplierId);
+
+        return products.stream()
+                .mapToInt(
+                        Product::getQuantity)
+                .sum();
     }
 }

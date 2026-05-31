@@ -22,4 +22,8 @@ public interface SupplierService {
             Integer id);
 
     void deleteAllSuppliers();
+
+    // Get Total Stock By Supplier
+    Integer getTotalStockBySupplier(
+            Integer supplierId);
 }

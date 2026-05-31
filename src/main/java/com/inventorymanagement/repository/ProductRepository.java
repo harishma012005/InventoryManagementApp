@@ -27,7 +27,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     // Filter By Quantity
     List<Product> findByQuantityLessThanEqual(Integer quantity);
-
+    List<Product> findByQuantity(
+            Integer quantity);
     
     boolean existsByProductNameAndSupplier_SupplierIdAndCategory_CategoryId(
             String productName,

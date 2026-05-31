@@ -135,4 +135,25 @@ public class SupplierController {
 
         return response;
     }
+    @GetMapping("/{id}/total-stock")
+    public Map<String,Object>
+    getTotalStockBySupplier(
+            @PathVariable Integer id){
+
+        Map<String,Object> response =
+                new HashMap<>();
+
+        response.put("status", 200);
+
+        response.put(
+                "message",
+                "Supplier Stock Retrieved Successfully");
+
+        response.put(
+                "totalStock",
+                supplierService
+                        .getTotalStockBySupplier(id));
+
+        return response;
+    }
 }
