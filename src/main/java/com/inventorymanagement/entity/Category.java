@@ -34,11 +34,14 @@ public class Category {
 
     private String description;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(
+            mappedBy = "category",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
     @JsonIgnore
-
     private List<Product> products;
-
     @CreationTimestamp
     @Column(name = "created_at",
             updatable = false)

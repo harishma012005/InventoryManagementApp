@@ -2,24 +2,19 @@ package com.inventorymanagement.service;
 
 import java.util.List;
 
-import com.inventorymanagement.entity.Category;
+import com.inventorymanagement.dto.CategoryDTO;
 
 public interface CategoryService {
 
-    Category saveCategory(
-            Category category);
+    CategoryDTO saveCategory(CategoryDTO categoryDTO);
 
-    List<Category> getAllCategories();
+    List<CategoryDTO> getAllCategories();
 
-    Category getCategoryById(
-            Integer id);
+    CategoryDTO getCategoryById(Integer id);
 
-    Category updateCategory(
-            Integer id,
-            Category category);
+    CategoryDTO updateCategory(Integer id, CategoryDTO categoryDTO);
 
-    void deleteCategory(
-            Integer id);
+    void deleteCategory(Integer id);
 
     void deleteAllCategories();
 }

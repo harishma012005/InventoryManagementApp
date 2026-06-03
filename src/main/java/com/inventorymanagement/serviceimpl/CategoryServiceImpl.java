@@ -1,92 +1,108 @@
 package com.inventorymanagement.serviceimpl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.inventorymanagement.dto.CategoryDTO;
 import com.inventorymanagement.entity.Category;
 import com.inventorymanagement.exception.ResourceNotFoundException;
 import com.inventorymanagement.repository.CategoryRepository;
 import com.inventorymanagement.service.CategoryService;
 
 @Service
-public class CategoryServiceImpl
-        implements CategoryService {
+public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
 
+    // Convert Entity → DTO
+    private CategoryDTO convertToDTO(Category category) {
+
+        CategoryDTO dto = new CategoryDTO();
+
+        dto.setCategoryId(category.getCategoryId());
+        dto.setCategoryName(category.getCategoryName());
+        dto.setDescription(category.getDescription());
+
+        return dto;
+    }
+
+    // Convert DTO → Entity
+    private Category convertToEntity(CategoryDTO dto) {
+
+        Category category = new Category();
+
+        category.setCategoryName(dto.getCategoryName());
+        category.setDescription(dto.getDescription());
+
+        return category;
+    }
+
     // Save Category
     @Override
-    public Category saveCategory(
-            Category category) {
+    public CategoryDTO saveCategory(CategoryDTO dto) {
 
-        return categoryRepository.save(
-                category);
+        Category category = convertToEntity(dto);
+
+        Category saved = categoryRepository.save(category);
+
+        return convertToDTO(saved);
     }
 
-    // Get All Categories
+    // Get All
     @Override
-    public List<Category> getAllCategories() {
+    public List<CategoryDTO> getAllCategories() {
 
-        return categoryRepository.findAll();
+        return categoryRepository.findAll()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    // Get Category By ID
+    // Get By ID
     @Override
-    public Category getCategoryById(
-            Integer id) {
+    public CategoryDTO getCategoryById(Integer id) {
 
-        return categoryRepository.findById(id)
+        Category category = categoryRepository.findById(id)
                 .orElseThrow(() ->
-                new ResourceNotFoundException(
-                "Category Not Found With ID : "
-                + id));
+                        new ResourceNotFoundException("Category Not Found With ID: " + id));
+
+        return convertToDTO(category);
     }
 
-    // Update Category
+    // Update
     @Override
-    public Category updateCategory(
-            Integer id,
-            Category category) {
+    public CategoryDTO updateCategory(Integer id, CategoryDTO dto) {
 
-        Category existingCategory =
-                categoryRepository.findById(id)
+        Category existing = categoryRepository.findById(id)
                 .orElseThrow(() ->
-                new ResourceNotFoundException(
-                "Category Not Found With ID : "
-                + id));
+                        new ResourceNotFoundException("Category Not Found With ID: " + id));
 
-        existingCategory.setCategoryName(
-                category.getCategoryName());
+        existing.setCategoryName(dto.getCategoryName());
+        existing.setDescription(dto.getDescription());
 
-        existingCategory.setDescription(
-                category.getDescription());
+        Category updated = categoryRepository.save(existing);
 
-        return categoryRepository.save(
-                existingCategory);
+        return convertToDTO(updated);
     }
 
-    // Delete Category
+    // Delete
     @Override
-    public void deleteCategory(
-            Integer id) {
+    public void deleteCategory(Integer id) {
 
-        Category category =
-                categoryRepository.findById(id)
+        Category category = categoryRepository.findById(id)
                 .orElseThrow(() ->
-                new ResourceNotFoundException(
-                "Category Not Found With ID : "
-                + id));
+                        new ResourceNotFoundException("Category Not Found With ID: " + id));
 
         categoryRepository.delete(category);
     }
 
-    // Delete All Categories
+    // Delete All
     @Override
     public void deleteAllCategories() {
-
         categoryRepository.deleteAll();
     }
 }

@@ -6,9 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.inventorymanagement.entity.Product;
+import com.inventorymanagement.dto.CreateProductDTO;
+import com.inventorymanagement.dto.ProductDTO;
 import com.inventorymanagement.service.ProductService;
 
 import jakarta.validation.Valid;
@@ -20,187 +23,138 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    // Add Product
-    @PostMapping
-    public Map<String, Object> saveProduct(
-            @Valid
-            @RequestBody Product product) {
+    // ================= CREATE PRODUCT =================
+    @PostMapping("/save")
+    public ResponseEntity<Map<String, Object>> saveProduct(
+            @Valid @RequestBody CreateProductDTO dto) {
 
-        Product savedProduct =
-                productService.saveProduct(
-                product);
+        ProductDTO savedProduct = productService.saveProduct(dto);
 
-        Map<String, Object> response =
-                new HashMap<>();
-
+        Map<String, Object> response = new HashMap<>();
         response.put("status", 201);
-        response.put(
-                "message",
-                "Product Saved Successfully");
+        response.put("message", "Product Saved Successfully");
+        response.put("data", savedProduct);
 
-        response.put(
-                "data",
-                savedProduct);
-
-        return response;
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Get All Products
-    @GetMapping
-    public List<Product> getAllProducts() {
-
-        return productService.getAllProducts();
+    // ================= GET ALL =================
+    @GetMapping("/getAll")
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
-    // Get Product By ID
-    @GetMapping("/{id}")
-    public Product getProductById(
+    // ================= GET BY ID =================
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<ProductDTO> getProductById(
             @PathVariable Integer id) {
 
-        return productService.getProductById(id);
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 
-    // Search By Product Name
-    @GetMapping("/search/{productName}")
-    public List<Product>
-    searchProductsByName(
+    // ================= SEARCH BY NAME =================
+    @GetMapping("/search/name/{productName}")
+    public ResponseEntity<List<ProductDTO>> searchByName(
             @PathVariable String productName) {
 
-        return productService
-                .searchProductsByName(
-                productName);
+        return ResponseEntity.ok(
+                productService.searchProductsByName(productName));
     }
 
-    // Search By Category
+    // ================= SEARCH BY CATEGORY =================
     @GetMapping("/search/category/{category}")
-    public List<Product>
-    searchProductsByCategory(
+    public ResponseEntity<List<ProductDTO>> searchByCategory(
             @PathVariable String category) {
 
-        return productService
-                .searchProductsByCategory(
-                category);
+        return ResponseEntity.ok(
+                productService.searchProductsByCategory(category));
     }
 
-    // Search By Supplier Name
+    // ================= SEARCH BY SUPPLIER NAME =================
     @GetMapping("/search/supplier/{supplierName}")
-    public List<Product>
-    searchProductsBySupplierName(
+    public ResponseEntity<List<ProductDTO>> searchBySupplier(
             @PathVariable String supplierName) {
 
-        return productService
-                .searchProductsBySupplierName(
-                supplierName);
+        return ResponseEntity.ok(
+                productService.searchProductsBySupplierName(supplierName));
     }
 
-    // Filter By Supplier ID
+    // ================= FILTER BY SUPPLIER ID =================
     @GetMapping("/supplier/{supplierId}")
-    public List<Product>
-    getProductsBySupplierId(
+    public ResponseEntity<List<ProductDTO>> getBySupplierId(
             @PathVariable Integer supplierId) {
 
-        return productService
-                .getProductsBySupplierId(
-                supplierId);
+        return ResponseEntity.ok(
+                productService.getProductsBySupplierId(supplierId));
     }
 
-    // Filter By Category
+    // ================= FILTER BY CATEGORY =================
     @GetMapping("/category/{category}")
-    public List<Product>
-    getProductsByCategory(
+    public ResponseEntity<List<ProductDTO>> getByCategory(
             @PathVariable String category) {
 
-        return productService
-                .getProductsByCategory(
-                category);
+        return ResponseEntity.ok(
+                productService.getProductsByCategory(category));
     }
 
-    // Filter By Price
+    // ================= FILTER BY PRICE =================
     @GetMapping("/price/{price}")
-    public List<Product>
-    getProductsByPrice(
+    public ResponseEntity<List<ProductDTO>> getByPrice(
             @PathVariable BigDecimal price) {
 
-        return productService
-                .getProductsByPrice(
-                price);
+        return ResponseEntity.ok(
+                productService.getProductsByPrice(price));
     }
 
-    // Filter By Quantity
+    // ================= FILTER BY QUANTITY =================
     @GetMapping("/quantity/{quantity}")
-    public List<Product>
-    getProductsByQuantity(
+    public ResponseEntity<List<ProductDTO>> getByQuantity(
             @PathVariable Integer quantity) {
 
-        return productService
-                .getProductsByQuantity(
-                quantity);
+        return ResponseEntity.ok(
+                productService.getProductsByQuantity(quantity));
     }
 
-    // Update Product
-    @PutMapping("/{id}")
-    public Map<String, Object> updateProduct(
-    		
+    // ================= UPDATE PRODUCT =================
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Map<String, Object>> updateProduct(
             @PathVariable Integer id,
-            @Valid
-            
-            @RequestBody Product product) {
+            @Valid @RequestBody CreateProductDTO dto) {
 
-        Product updatedProduct =
-                productService.updateProduct(
-                id, product);
+        ProductDTO updatedProduct = productService.updateProduct(id, dto);
 
-        Map<String, Object> response =
-                new HashMap<>();
-
+        Map<String, Object> response = new HashMap<>();
         response.put("status", 200);
+        response.put("message", "Product Updated Successfully");
+        response.put("data", updatedProduct);
 
-        response.put(
-                "message",
-                "Product Updated Successfully");
-
-        response.put(
-                "data",
-                updatedProduct);
-
-        return response;
+        return ResponseEntity.ok(response);
     }
 
-    // Delete Product
-    @DeleteMapping("/{id}")
-    public Map<String, Object> deleteProduct(
+    // ================= DELETE PRODUCT =================
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Map<String, Object>> deleteProduct(
             @PathVariable Integer id) {
 
         productService.deleteProduct(id);
 
-        Map<String, Object> response =
-                new HashMap<>();
-
+        Map<String, Object> response = new HashMap<>();
         response.put("status", 200);
+        response.put("message", "Product Deleted Successfully");
 
-        response.put(
-                "message",
-                "Product Deleted Successfully");
-
-        return response;
+        return ResponseEntity.ok(response);
     }
 
-    // Delete All Products
-    @DeleteMapping
-    public Map<String, Object>
-    deleteAllProducts() {
+    // ================= DELETE ALL =================
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<Map<String, Object>> deleteAllProducts() {
 
         productService.deleteAllProducts();
 
-        Map<String, Object> response =
-                new HashMap<>();
-
+        Map<String, Object> response = new HashMap<>();
         response.put("status", 200);
+        response.put("message", "All Products Deleted Successfully");
 
-        response.put(
-                "message",
-                "All Products Deleted Successfully");
-
-        return response;
+        return ResponseEntity.ok(response);
     }
 }

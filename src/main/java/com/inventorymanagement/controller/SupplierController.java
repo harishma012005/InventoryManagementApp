@@ -5,155 +5,96 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.inventorymanagement.entity.Supplier;
+import com.inventorymanagement.dto.SupplierDTO;
 import com.inventorymanagement.service.SupplierService;
 
-import jakarta.validation.Valid;
-
 @RestController
-@RequestMapping("/suppliers")
+@RequestMapping("/supplier")
 public class SupplierController {
 
     @Autowired
     private SupplierService supplierService;
 
-    // Add Supplier
-    @PostMapping
-    public Map<String, Object> saveSupplier(
-    		@Valid
-    		
-            @RequestBody Supplier supplier) {
+    // SAVE
+    @PostMapping("/save")
+    public ResponseEntity<Map<String, Object>> saveSupplier(@RequestBody SupplierDTO dto) {
 
-        Supplier savedSupplier =
-                supplierService.saveSupplier(
-                supplier);
+        SupplierDTO saved = supplierService.saveSupplier(dto);
 
-        Map<String, Object> response =
-                new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Supplier saved successfully");
+        response.put("data", saved);
 
-        response.put(
-                "status",
-                201);
-
-        response.put(
-                "message",
-                "Supplier Saved Successfully");
-
-        response.put(
-                "data",
-                savedSupplier);
-
-        return response;
+        return ResponseEntity.ok(response);
     }
 
-    // Get All Suppliers
-    @GetMapping
-    public List<Supplier> getAllSuppliers() {
+    // GET ALL
+    @GetMapping("/getAll")
+    public ResponseEntity<Map<String, Object>> getAllSuppliers() {
 
-        return supplierService
-                .getAllSuppliers();
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", supplierService.getAllSuppliers());
+
+        return ResponseEntity.ok(response);
     }
 
-    // Get Supplier By ID
-    @GetMapping("/{id}")
-    public Supplier getSupplierById(
-            @PathVariable Integer id) {
+    // GET BY ID
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<Map<String, Object>> getSupplierById(@PathVariable Integer id) {
 
-        return supplierService
-                .getSupplierById(id);
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", supplierService.getSupplierById(id));
+
+        return ResponseEntity.ok(response);
     }
 
-    // Update Supplier
-    @PutMapping("/{id}")
-    public Map<String, Object> updateSupplier(
+    // UPDATE
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Map<String, Object>> updateSupplier(
             @PathVariable Integer id,
-            @Valid
-            @RequestBody Supplier supplier) {
+            @RequestBody SupplierDTO dto) {
 
-        Supplier updatedSupplier =
-                supplierService.updateSupplier(
-                id, supplier);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Supplier updated successfully");
+        response.put("data", supplierService.updateSupplier(id, dto));
 
-        Map<String, Object> response =
-                new HashMap<>();
-
-        response.put(
-                "status",
-                200);
-
-        response.put(
-                "message",
-                "Supplier Updated Successfully");
-
-        response.put(
-                "data",
-                updatedSupplier);
-
-        return response;
+        return ResponseEntity.ok(response);
     }
 
-    // Delete Supplier
-    @DeleteMapping("/{id}")
-    public Map<String, Object> deleteSupplier(
-            @PathVariable Integer id) {
+    // DELETE
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Map<String, Object>> deleteSupplier(@PathVariable Integer id) {
 
         supplierService.deleteSupplier(id);
 
-        Map<String, Object> response =
-                new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Supplier deleted successfully");
 
-        response.put(
-                "status",
-                200);
-
-        response.put(
-                "message",
-                "Supplier Deleted Successfully");
-
-        return response;
+        return ResponseEntity.ok(response);
     }
 
-    // Delete All Suppliers
-    @DeleteMapping
-    public Map<String, Object>
-    deleteAllSuppliers() {
+    // DELETE ALL
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<Map<String, Object>> deleteAllSuppliers() {
 
         supplierService.deleteAllSuppliers();
 
-        Map<String, Object> response =
-                new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "All suppliers deleted successfully");
 
-        response.put(
-                "status",
-                200);
-
-        response.put(
-                "message",
-                "All Suppliers Deleted Successfully");
-
-        return response;
+        return ResponseEntity.ok(response);
     }
-    @GetMapping("/{id}/total-stock")
-    public Map<String,Object>
-    getTotalStockBySupplier(
-            @PathVariable Integer id){
 
-        Map<String,Object> response =
-                new HashMap<>();
+    // TOTAL STOCK
+    @GetMapping("/totalStock/{id}")
+    public ResponseEntity<Map<String, Object>> getTotalStock(@PathVariable Integer id) {
 
-        response.put("status", 200);
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalStock", supplierService.getTotalStockBySupplier(id));
 
-        response.put(
-                "message",
-                "Supplier Stock Retrieved Successfully");
-
-        response.put(
-                "totalStock",
-                supplierService
-                        .getTotalStockBySupplier(id));
-
-        return response;
+        return ResponseEntity.ok(response);
     }
 }

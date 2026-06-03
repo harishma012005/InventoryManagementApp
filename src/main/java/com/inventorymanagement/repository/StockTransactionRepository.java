@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.inventorymanagement.entity.Product;
 import com.inventorymanagement.entity.StockTransaction;
 
 public interface StockTransactionRepository
@@ -12,5 +13,6 @@ public interface StockTransactionRepository
 	List<StockTransaction>
 	findByProduct_ProductId(
 	        Integer productId);
+	
 
 }

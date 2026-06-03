@@ -1,261 +1,180 @@
-
 package com.inventorymanagement.serviceimpl;
 
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.inventorymanagement.entity.Product;
-import com.inventorymanagement.entity.StockTransaction;
+import com.inventorymanagement.dto.StockTransactionDTO;
+import com.inventorymanagement.entity.*;
 import com.inventorymanagement.exception.ResourceNotFoundException;
-import com.inventorymanagement.repository.ProductRepository;
-import com.inventorymanagement.repository.StockTransactionRepository;
+import com.inventorymanagement.repository.*;
 import com.inventorymanagement.service.StockService;
 
 @Service
-public class StockServiceImpl
-        implements StockService {
+public class StockServiceImpl implements StockService {
 
     @Autowired
     private ProductRepository productRepository;
 
     @Autowired
-    private StockTransactionRepository
-            stockTransactionRepository;
+    private StockTransactionRepository stockTransactionRepository;
 
-    @Override
-    public Product stockIn(
-            Integer productId,
-            Integer quantity) {
+    // ---------------- DTO MAPPER ----------------
+    private StockTransactionDTO convertToDTO(StockTransaction tx) {
 
-        if(quantity <= 0) {
+        StockTransactionDTO dto = new StockTransactionDTO();
 
-            throw new RuntimeException(
-                    "Stock In Quantity Must Be Greater Than Zero");
-        }
+        dto.setTransactionId(tx.getTransactionId());
+        dto.setProductId(tx.getProduct().getProductId());
+        dto.setProductName(tx.getProduct().getProductName());
+        dto.setTransactionType(tx.getTransactionType());
+        dto.setQuantity(tx.getQuantity());
+        dto.setTransactionDate(tx.getTransactionDate());
 
-        Product product =
-                productRepository.findById(productId)
-
-                .orElseThrow(() ->
-                new ResourceNotFoundException(
-                        "Product Not Found With ID : "
-                                + productId));
-
-        product.setQuantity(
-                product.getQuantity() + quantity);
-
-        Product updatedProduct =
-                productRepository.save(product);
-
-        StockTransaction transaction =
-                new StockTransaction();
-
-        transaction.setProduct(updatedProduct);
-
-        transaction.setTransactionType(
-                "STOCK_IN");
-
-        transaction.setQuantity(quantity);
-
-        transaction.setTransactionDate(
-                LocalDateTime.now());
-
-        stockTransactionRepository
-                .save(transaction);
-
-        return updatedProduct;
+        return dto;
     }
 
-    @Override
-    public Product stockOut(
-            Integer productId,
-            Integer quantity) {
+    // ---------------- SAVE TRANSACTION ----------------
+    private void saveTransaction(Product product, String type, Integer qty) {
 
-        if(quantity <= 0) {
+        StockTransaction tx = new StockTransaction();
+        tx.setProduct(product);
+        tx.setTransactionType(type);
+        tx.setQuantity(qty);
+        tx.setTransactionDate(LocalDateTime.now());
 
-            throw new RuntimeException(
-                    "Stock Out Quantity Must Be Greater Than Zero");
-        }
-
-        Product product =
-                productRepository.findById(productId)
-
-                .orElseThrow(() ->
-                new ResourceNotFoundException(
-                        "Product Not Found With ID : "
-                                + productId));
-
-        if(product.getQuantity() < quantity) {
-
-            throw new RuntimeException(
-                    "Insufficient Stock Available");
-        }
-
-        product.setQuantity(
-                product.getQuantity() - quantity);
-
-        Product updatedProduct =
-                productRepository.save(product);
-
-        StockTransaction transaction =
-                new StockTransaction();
-
-        transaction.setProduct(updatedProduct);
-
-        transaction.setTransactionType(
-                "STOCK_OUT");
-
-        transaction.setQuantity(quantity);
-
-        transaction.setTransactionDate(
-                LocalDateTime.now());
-
-        stockTransactionRepository
-                .save(transaction);
-
-        return updatedProduct;
+        stockTransactionRepository.save(tx);
     }
 
+    // ---------------- STOCK IN ----------------
+    @Override
+    public StockTransactionDTO stockIn(Integer productId, Integer quantity) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
+
+        product.setQuantity(product.getQuantity() + quantity);
+
+        productRepository.save(product);
+
+        StockTransaction tx = new StockTransaction();
+        tx.setProduct(product);
+        tx.setTransactionType("STOCK_IN");
+        tx.setQuantity(quantity);
+        tx.setTransactionDate(LocalDateTime.now());
+
+        StockTransaction savedTx = stockTransactionRepository.save(tx);
+
+        return convertToDTO(savedTx);
+    }
+    // ---------------- STOCK OUT ----------------
+    @Override
+    public StockTransactionDTO stockOut(Integer productId, Integer quantity) {
+
+        if (quantity <= 0) {
+            throw new RuntimeException("Quantity must be greater than 0");
+        }
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
+
+        if (product.getQuantity() < quantity) {
+            throw new RuntimeException("Insufficient Stock");
+        }
+
+        // reduce stock
+        product.setQuantity(product.getQuantity() - quantity);
+        Product savedProduct = productRepository.save(product);
+
+        // create transaction
+        StockTransaction tx = new StockTransaction();
+        tx.setProduct(savedProduct);
+        tx.setTransactionType("STOCK_OUT");
+        tx.setQuantity(quantity);
+        tx.setTransactionDate(LocalDateTime.now());
+
+        StockTransaction savedTx = stockTransactionRepository.save(tx);
+
+        // return DTO (NOT ENTITY)
+        return convertToDTO(savedTx);
+    }
+
+    // ---------------- TOTAL STOCK ----------------
     @Override
     public Integer getTotalStock() {
-
-        List<Product> products =
-                productRepository.findAll();
-
-        return products.stream()
-
+        return productRepository.findAll()
+                .stream()
                 .mapToInt(Product::getQuantity)
-
                 .sum();
     }
 
+    // ---------------- STATUS ----------------
     @Override
-    public String getStockStatus(
-            Integer productId) {
+    public String getStockStatus(Integer productId) {
 
-        Product product =
-                productRepository.findById(productId)
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
 
-                .orElseThrow(() ->
-                new ResourceNotFoundException(
-                        "Product Not Found With ID : "
-                                + productId));
-
-        Integer quantity =
-                product.getQuantity();
-
-        if(quantity == 0) {
-
-            return "OUT_OF_STOCK";
-        }
-
-        if(quantity <= 5) {
-
-            return "LOW_STOCK";
-        }
-
+        if (product.getQuantity() == 0) return "OUT_OF_STOCK";
+        if (product.getQuantity() <= 5) return "LOW_STOCK";
         return "AVAILABLE";
     }
 
+    // ---------------- LOW STOCK ----------------
     @Override
-    public List<Product>
-    getLowStockProducts() {
-
-        return productRepository
-                .findByQuantityLessThanEqual(5);
+    public List<Product> getLowStockProducts() {
+        return productRepository.findByQuantityLessThanEqual(5);
     }
+
+    // ---------------- STOCK HISTORY ----------------
+    @Override
+    public List<StockTransactionDTO> getStockHistory() {
+        return stockTransactionRepository.findAll()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ---------------- STOCK HISTORY BY PRODUCT ----------------
+    @Override
+    public List<StockTransactionDTO> getStockHistoryByProduct(Integer productId) {
+        return stockTransactionRepository.findByProduct_ProductId(productId)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ---------------- OUT OF STOCK ----------------
+    @Override
+    public List<Product> getOutOfStockProducts() {
+        return productRepository.findByQuantity(0);
+    }
+
+    // ---------------- INVENTORY VALUE ----------------
     @Override
     public Double getInventoryValue() {
-
         return productRepository.findAll()
                 .stream()
-                .mapToDouble(product ->
-                        product.getPrice().doubleValue()
-                        * product.getQuantity())
+                .mapToDouble(p -> p.getPrice().doubleValue() * p.getQuantity())
                 .sum();
     }
 
+    // ---------------- DASHBOARD ----------------
     @Override
-    public List<StockTransaction>
-    getStockHistory() {
+    public Map<String, Object> getDashboardSummary() {
 
-        return stockTransactionRepository
-                .findAll();
-    }
-    @Override
-    public List<StockTransaction>
-    getStockHistoryByProduct(
-            Integer productId) {
+        Map<String, Object> map = new HashMap<>();
 
-        return stockTransactionRepository
-                .findByProduct_ProductId(
-                        productId);
-        
-    }
-    @Override
-    public List<Product>
-    getOutOfStockProducts() {
+        List<Product> products = productRepository.findAll();
 
-        return productRepository
-                .findByQuantity(0);
-    }
-    @Override
-    public Map<String, Object>
-    getDashboardSummary() {
+        map.put("totalProducts", products.size());
+        map.put("totalStock", products.stream().mapToInt(Product::getQuantity).sum());
+        map.put("lowStockProducts", products.stream().filter(p -> p.getQuantity() <= 5).count());
+        map.put("outOfStockProducts", products.stream().filter(p -> p.getQuantity() == 0).count());
 
-        Map<String, Object> summary =
-                new HashMap<>();
-
-        List<Product> products =
-                productRepository.findAll();
-
-        Integer totalProducts =
-                products.size();
-
-        Integer totalStock =
-                products.stream()
-
-                .mapToInt(Product::getQuantity)
-
-                .sum();
-
-        long lowStockProducts =
-                products.stream()
-
-                .filter(product ->
-                        product.getQuantity() <= 5)
-
-                .count();
-
-        long outOfStockProducts =
-                products.stream()
-
-                .filter(product ->
-                        product.getQuantity() == 0)
-
-                .count();
-
-        summary.put(
-                "totalProducts",
-                totalProducts);
-
-        summary.put(
-                "totalStock",
-                totalStock);
-
-        summary.put(
-                "lowStockProducts",
-                lowStockProducts);
-
-        summary.put(
-                "outOfStockProducts",
-                outOfStockProducts);
-
-        return summary;
+        return map;
     }
 }

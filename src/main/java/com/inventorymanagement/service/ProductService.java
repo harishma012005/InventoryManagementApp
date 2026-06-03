@@ -1,62 +1,37 @@
-
 package com.inventorymanagement.service;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.inventorymanagement.entity.Product;
+import com.inventorymanagement.dto.CreateProductDTO;
+import com.inventorymanagement.dto.ProductDTO;
 
 public interface ProductService {
 
-    Product saveProduct(
-            Product product);
+    ProductDTO saveProduct(CreateProductDTO createProductDTO);
 
-    List<Product> getAllProducts();
+    List<ProductDTO> getAllProducts();
 
-    Product getProductById(
-            Integer id);
+    ProductDTO getProductById(Integer id);
 
-    Product updateProduct(
-            Integer id,
-            Product product);
+    ProductDTO updateProduct(Integer id, CreateProductDTO createProductDTO);
 
-    void deleteProduct(
-            Integer id);
+    void deleteProduct(Integer id);
 
     void deleteAllProducts();
 
-    // Filter By Supplier ID
-    List<Product>
-    getProductsBySupplierId(
-            Integer supplierId);
+    // Filters
+    List<ProductDTO> getProductsBySupplierId(Integer supplierId);
 
-    // Search Product By Name
-    List<Product>
-    searchProductsByName(
-            String productName);
+    List<ProductDTO> searchProductsByName(String productName);
 
-    // Search Product By Category
-    List<Product>
-    searchProductsByCategory(
-            String category);
+    List<ProductDTO> searchProductsByCategory(String category);
 
-    // Search Product By Supplier Name
-    List<Product>
-    searchProductsBySupplierName(
-            String supplierName);
+    List<ProductDTO> searchProductsBySupplierName(String supplierName);
 
-    // Filter By Category
-    List<Product>
-    getProductsByCategory(
-            String category);
+    List<ProductDTO> getProductsByCategory(String category);
 
-    // Filter By Price
-    List<Product>
-    getProductsByPrice(
-            BigDecimal price);
+    List<ProductDTO> getProductsByPrice(BigDecimal price);
 
-    // Filter By Quantity
-    List<Product>
-    getProductsByQuantity(
-            Integer quantity);
+    List<ProductDTO> getProductsByQuantity(Integer quantity);
 }

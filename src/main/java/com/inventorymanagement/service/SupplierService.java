@@ -2,28 +2,21 @@ package com.inventorymanagement.service;
 
 import java.util.List;
 
-import com.inventorymanagement.entity.Supplier;
+import com.inventorymanagement.dto.SupplierDTO;
 
 public interface SupplierService {
 
-    Supplier saveSupplier(
-            Supplier supplier);
+    SupplierDTO saveSupplier(SupplierDTO supplierDTO);
 
-    List<Supplier> getAllSuppliers();
+    List<SupplierDTO> getAllSuppliers();
 
-    Supplier getSupplierById(
-            Integer id);
+    SupplierDTO getSupplierById(Integer id);
 
-    Supplier updateSupplier(
-            Integer id,
-            Supplier supplier);
+    SupplierDTO updateSupplier(Integer id, SupplierDTO supplierDTO);
 
-    void deleteSupplier(
-            Integer id);
+    void deleteSupplier(Integer id);
 
     void deleteAllSuppliers();
 
-    // Get Total Stock By Supplier
-    Integer getTotalStockBySupplier(
-            Integer supplierId);
+    Integer getTotalStockBySupplier(Integer supplierId);
 }

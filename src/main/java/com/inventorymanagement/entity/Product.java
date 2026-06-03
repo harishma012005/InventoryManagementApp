@@ -7,68 +7,51 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.*;
-
 import jakarta.validation.constraints.*;
 
 @Entity
 @Table(
-	    name = "products",
-	    uniqueConstraints = @UniqueConstraint(
-	        columnNames = {"product_name", "supplier_id", "category_id"}
-	    )
-	)
+    name = "products",
+    uniqueConstraints = @UniqueConstraint(
+        columnNames = {"product_name", "supplier_id", "category_id"}
+    )
+)
 public class Product {
 
     @Id
-    @GeneratedValue(strategy =
-            GenerationType.IDENTITY)
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private Integer productId;
 
-    @NotBlank(message =
-            "Product Name Cannot Be Empty")
-
+    @NotBlank
     @Column(name = "product_name")
     private String productName;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-
     private Category category;
-
-    @NotNull(message =
-            "Quantity Cannot Be Null")
-
-    @Min(value = 0,
-            message =
-            "Quantity Cannot Be Negative")
-
-    private Integer quantity;
-
-    @NotNull(message =
-            "Price Cannot Be Null")
-
-    @Positive(message =
-            "Price Must Be Greater Than Zero")
-
-    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "supplier_id")
-
     private Supplier supplier;
 
-    @CreationTimestamp
-    @Column(name = "created_at",
-            updatable = false)
+    @NotNull
+    @Min(0)
+    private Integer quantity;
 
+    @NotNull
+    @Positive
+    private BigDecimal price;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
-
     private LocalDateTime updatedAt;
+
+    // getters & setters
+
 
     // Getters and Setters
 

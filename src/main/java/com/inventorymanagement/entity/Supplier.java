@@ -9,7 +9,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
-
 import jakarta.validation.constraints.*;
 
 @Entity
@@ -17,58 +16,48 @@ import jakarta.validation.constraints.*;
 public class Supplier {
 
     @Id
-    @GeneratedValue(strategy =
-            GenerationType.IDENTITY)
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "supplier_id")
     private Integer supplierId;
 
-    @NotBlank(message =
-            "Supplier Name Cannot Be Empty")
-
+    @NotBlank(message = "Supplier Name Cannot Be Empty")
     @Column(name = "supplier_name")
     private String supplierName;
 
-    @Email(message =
-            "Invalid Email Format")
-
+    @Email(message = "Invalid Email Format")
     private String email;
 
-    @NotBlank(message =
-            "Phone Number Cannot Be Empty")
-
+    @NotBlank(message = "Phone Number Cannot Be Empty")
     private String phone;
 
-    @NotBlank(message =
-            "Address Cannot Be Empty")
-
+    @NotBlank(message = "Address Cannot Be Empty")
     private String address;
 
-    @OneToMany(mappedBy = "supplier")
+    // 🔥 IMPORTANT RELATIONSHIP FIX
+    @OneToMany(
+            mappedBy = "supplier",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
     @JsonIgnore
-
     private List<Product> products;
 
     @CreationTimestamp
-    @Column(name = "created_at",
-            updatable = false)
-
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-
     private LocalDateTime updatedAt;
 
-    // Getters and Setters
+    // ================= GETTERS & SETTERS =================
 
     public Integer getSupplierId() {
         return supplierId;
     }
 
-    public void setSupplierId(
-            Integer supplierId) {
-
+    public void setSupplierId(Integer supplierId) {
         this.supplierId = supplierId;
     }
 
@@ -76,9 +65,7 @@ public class Supplier {
         return supplierName;
     }
 
-    public void setSupplierName(
-            String supplierName) {
-
+    public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
     }
 
@@ -86,9 +73,7 @@ public class Supplier {
         return email;
     }
 
-    public void setEmail(
-            String email) {
-
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -96,9 +81,7 @@ public class Supplier {
         return phone;
     }
 
-    public void setPhone(
-            String phone) {
-
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
@@ -106,9 +89,7 @@ public class Supplier {
         return address;
     }
 
-    public void setAddress(
-            String address) {
-
+    public void setAddress(String address) {
         this.address = address;
     }
 
@@ -116,9 +97,7 @@ public class Supplier {
         return products;
     }
 
-    public void setProducts(
-            List<Product> products) {
-
+    public void setProducts(List<Product> products) {
         this.products = products;
     }
 
@@ -126,9 +105,7 @@ public class Supplier {
         return createdAt;
     }
 
-    public void setCreatedAt(
-            LocalDateTime createdAt) {
-
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -136,9 +113,7 @@ public class Supplier {
         return updatedAt;
     }
 
-    public void setUpdatedAt(
-            LocalDateTime updatedAt) {
-
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

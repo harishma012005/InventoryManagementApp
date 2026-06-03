@@ -1,20 +1,21 @@
 package com.inventorymanagement.serviceimpl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.inventorymanagement.entity.Product;
+import com.inventorymanagement.dto.SupplierDTO;
 import com.inventorymanagement.entity.Supplier;
+import com.inventorymanagement.entity.Product;
 import com.inventorymanagement.exception.ResourceNotFoundException;
 import com.inventorymanagement.repository.ProductRepository;
 import com.inventorymanagement.repository.SupplierRepository;
 import com.inventorymanagement.service.SupplierService;
 
 @Service
-public class SupplierServiceImpl
-        implements SupplierService {
+public class SupplierServiceImpl implements SupplierService {
 
     @Autowired
     private SupplierRepository supplierRepository;
@@ -22,108 +23,113 @@ public class SupplierServiceImpl
     @Autowired
     private ProductRepository productRepository;
 
-    // Save Supplier
-    @Override
-    public Supplier saveSupplier(
-            Supplier supplier) {
+    // ENTITY → DTO
+    private SupplierDTO convertToDTO(Supplier supplier) {
 
-        return supplierRepository.save(
-                supplier);
+        SupplierDTO dto = new SupplierDTO();
+
+        dto.setSupplierId(supplier.getSupplierId());
+        dto.setSupplierName(supplier.getSupplierName());
+        dto.setEmail(supplier.getEmail());
+        dto.setPhone(supplier.getPhone());
+        dto.setAddress(supplier.getAddress());
+
+        return dto;
     }
 
-    // Get All Suppliers
-    @Override
-    public List<Supplier> getAllSuppliers() {
+    // DTO → ENTITY
+    private Supplier convertToEntity(SupplierDTO dto) {
 
-        return supplierRepository.findAll();
+        Supplier supplier = new Supplier();
+
+        supplier.setSupplierName(dto.getSupplierName());
+        supplier.setEmail(dto.getEmail());
+        supplier.setPhone(dto.getPhone());
+        supplier.setAddress(dto.getAddress());
+
+        return supplier;
     }
 
-    // Get Supplier By ID
+    // SAVE
     @Override
-    public Supplier getSupplierById(
-            Integer id) {
+    public SupplierDTO saveSupplier(SupplierDTO dto) {
 
-        return supplierRepository.findById(id)
+        Supplier supplier = convertToEntity(dto);
+
+        Supplier saved = supplierRepository.save(supplier);
+
+        return convertToDTO(saved);
+    }
+
+    // GET ALL
+    @Override
+    public List<SupplierDTO> getAllSuppliers() {
+
+        return supplierRepository.findAll()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // GET BY ID
+    @Override
+    public SupplierDTO getSupplierById(Integer id) {
+
+        Supplier supplier = supplierRepository.findById(id)
                 .orElseThrow(() ->
-                new ResourceNotFoundException(
-                "Supplier Not Found With ID : "
-                + id));
+                        new ResourceNotFoundException("Supplier Not Found With ID: " + id));
+
+        return convertToDTO(supplier);
     }
 
-    // Update Supplier
+    // UPDATE
     @Override
-    public Supplier updateSupplier(
-            Integer id,
-            Supplier supplier) {
+    public SupplierDTO updateSupplier(Integer id, SupplierDTO dto) {
 
-        Supplier existingSupplier =
-                supplierRepository.findById(id)
+        Supplier existing = supplierRepository.findById(id)
                 .orElseThrow(() ->
-                new ResourceNotFoundException(
-                "Supplier Not Found With ID : "
-                + id));
+                        new ResourceNotFoundException("Supplier Not Found With ID: " + id));
 
-        existingSupplier.setSupplierName(
-                supplier.getSupplierName());
+        existing.setSupplierName(dto.getSupplierName());
+        existing.setEmail(dto.getEmail());
+        existing.setPhone(dto.getPhone());
+        existing.setAddress(dto.getAddress());
 
-        existingSupplier.setEmail(
-                supplier.getEmail());
+        Supplier updated = supplierRepository.save(existing);
 
-        existingSupplier.setPhone(
-                supplier.getPhone());
-
-        existingSupplier.setAddress(
-                supplier.getAddress());
-
-        return supplierRepository.save(
-                existingSupplier);
+        return convertToDTO(updated);
     }
 
-    // Delete Supplier
+    // DELETE
     @Override
-    public void deleteSupplier(
-            Integer id) {
+    public void deleteSupplier(Integer id) {
 
-        Supplier supplier =
-                supplierRepository.findById(id)
+        Supplier supplier = supplierRepository.findById(id)
                 .orElseThrow(() ->
-                new ResourceNotFoundException(
-                "Supplier Not Found With ID : "
-                + id));
+                        new ResourceNotFoundException("Supplier Not Found With ID: " + id));
 
-        supplierRepository.delete(
-                supplier);
+        supplierRepository.delete(supplier);
     }
 
-    // Delete All Suppliers
+    // DELETE ALL
     @Override
     public void deleteAllSuppliers() {
-
         supplierRepository.deleteAll();
     }
 
-    // Get Total Stock By Supplier
+    // TOTAL STOCK
     @Override
-    public Integer getTotalStockBySupplier(
-            Integer supplierId) {
+    public Integer getTotalStockBySupplier(Integer supplierId) {
 
-       
-                supplierRepository.findById(
-                        supplierId)
-
+        supplierRepository.findById(supplierId)
                 .orElseThrow(() ->
-                new ResourceNotFoundException(
-                "Supplier Not Found With ID : "
-                + supplierId));
+                        new ResourceNotFoundException("Supplier Not Found With ID: " + supplierId));
 
         List<Product> products =
-                productRepository
-                .findBySupplier_SupplierId(
-                        supplierId);
+                productRepository.findBySupplier_SupplierId(supplierId);
 
         return products.stream()
-                .mapToInt(
-                        Product::getQuantity)
+                .mapToInt(Product::getQuantity)
                 .sum();
     }
 }
