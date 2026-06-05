@@ -1,30 +1,16 @@
 package com.inventorymanagement.service;
 
 import java.util.List;
-import java.util.Map;
 
-import com.inventorymanagement.dto.StockTransactionDTO;
+import com.inventorymanagement.dto.StockDTO;
 import com.inventorymanagement.entity.Product;
+import com.inventorymanagement.dto.LowStockDTO;
 
 public interface StockService {
+	
+    List<StockDTO> getAllStock();
 
-    StockTransactionDTO stockIn(Integer productId, Integer quantity);
+    List<LowStockDTO> getLowStock(Integer threshold);
 
-    StockTransactionDTO stockOut(Integer productId, Integer quantity);
-
-    Integer getTotalStock();
-
-    String getStockStatus(Integer productId);
-
-    List<Product> getLowStockProducts();
-
-    List<StockTransactionDTO> getStockHistory();
-
-    List<StockTransactionDTO> getStockHistoryByProduct(Integer productId);
-
-    List<Product> getOutOfStockProducts();
-
-    Double getInventoryValue();
-
-    Map<String, Object> getDashboardSummary();
+    StockDTO getStockByProductId(Integer productId);
 }
