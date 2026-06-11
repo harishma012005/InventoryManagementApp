@@ -28,8 +28,7 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @Autowired
-    private SupplierRepository supplierRepository;
+   
     private ProductDTO convertToDTO(Product product) {
 
         ProductDTO dto = new ProductDTO();
@@ -39,8 +38,7 @@ public class ProductServiceImpl implements ProductService {
         dto.setCategoryName(product.getCategory().getCategoryName());
         dto.setQuantity(product.getQuantity());
         dto.setPrice(product.getPrice());
-        dto.setSupplierName(product.getSupplier().getSupplierName());
-
+       
         return dto;
     }
     private Product convertToEntity(
@@ -64,16 +62,9 @@ public class ProductServiceImpl implements ProductService {
                         new ResourceNotFoundException(
                                 "Category Not Found"));
 
-        Supplier supplier =
-                supplierRepository.findById(
-                        dto.getSupplierId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Supplier Not Found"));
-
+       
         product.setCategory(category);
-        product.setSupplier(supplier);
-
+       
         return product;
     }
     
@@ -86,17 +77,13 @@ public class ProductServiceImpl implements ProductService {
                 convertToEntity(dto);
 
         boolean exists =
-                productRepository
-                .existsByProductNameAndSupplier_SupplierIdAndCategory_CategoryId(
+        		productRepository
+        		.existsByProductNameAndCategory_CategoryId(
 
-                        product.getProductName(),
+        		        product.getProductName(),
 
-                        product.getSupplier()
-                               .getSupplierId(),
-
-                        product.getCategory()
-                               .getCategoryId());
-
+        		        product.getCategory()
+        		               .getCategoryId());
         if(exists) {
 
             throw new AlreadyExistsException(
@@ -155,13 +142,7 @@ public class ProductServiceImpl implements ProductService {
                         new ResourceNotFoundException(
                                 "Category Not Found"));
 
-        Supplier supplier =
-                supplierRepository.findById(
-                        dto.getSupplierId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Supplier Not Found"));
-
+        
         existingProduct.setProductName(
                 dto.getProductName());
 
@@ -174,9 +155,7 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setCategory(
                 category);
 
-        existingProduct.setSupplier(
-                supplier);
-
+      
         Product updatedProduct =
                 productRepository.save(
                         existingProduct);
@@ -201,18 +180,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // Filter By Supplier ID (FIXED)
-    @Override
-    public List<ProductDTO>
-    getProductsBySupplierId(
-            Integer supplierId) {
 
-        return productRepository
-                .findBySupplier_SupplierId(
-                        supplierId)
-                .stream()
-                .map(this::convertToDTO)
-                .toList();
-    }
     // Search By Product Name
     @Override
     public List<ProductDTO> searchProductsByName(String productName) {
@@ -236,18 +204,7 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
     }
     // Search By Supplier Name
-    @Override
-    public List<ProductDTO>
-    searchProductsBySupplierName(
-            String supplierName) {
-
-        return productRepository
-                .findBySupplier_SupplierNameContainingIgnoreCase(
-                        supplierName)
-                .stream()
-                .map(this::convertToDTO)
-                .toList();
-    }
+ 
     // Filter By Exact Category
     @Override
     public List<ProductDTO>

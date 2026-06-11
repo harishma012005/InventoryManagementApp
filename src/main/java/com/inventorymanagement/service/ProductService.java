@@ -14,24 +14,28 @@ public interface ProductService {
 
     ProductDTO getProductById(Integer id);
 
-    ProductDTO updateProduct(Integer id, CreateProductDTO createProductDTO);
+    ProductDTO updateProduct(
+            Integer id,
+            CreateProductDTO createProductDTO);
 
     void deleteProduct(Integer id);
 
     void deleteAllProducts();
 
+    // Search
+    List<ProductDTO> searchProductsByName(
+            String productName);
+
+    List<ProductDTO> searchProductsByCategory(
+            String category);
+
     // Filters
-    List<ProductDTO> getProductsBySupplierId(Integer supplierId);
+    List<ProductDTO> getProductsByCategory(
+            String category);
 
-    List<ProductDTO> searchProductsByName(String productName);
+    List<ProductDTO> getProductsByPrice(
+            BigDecimal price);
 
-    List<ProductDTO> searchProductsByCategory(String category);
-
-    List<ProductDTO> searchProductsBySupplierName(String supplierName);
-
-    List<ProductDTO> getProductsByCategory(String category);
-
-    List<ProductDTO> getProductsByPrice(BigDecimal price);
-
-    List<ProductDTO> getProductsByQuantity(Integer quantity);
+    List<ProductDTO> getProductsByQuantity(
+            Integer quantity);
 }

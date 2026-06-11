@@ -71,22 +71,10 @@ public class ProductController {
     }
 
     // ================= SEARCH BY SUPPLIER NAME =================
-    @GetMapping("/search/supplier/{supplierName}")
-    public ResponseEntity<List<ProductDTO>> searchBySupplier(
-            @PathVariable String supplierName) {
-
-        return ResponseEntity.ok(
-                productService.searchProductsBySupplierName(supplierName));
-    }
+   
 
     // ================= FILTER BY SUPPLIER ID =================
-    @GetMapping("/supplier/{supplierId}")
-    public ResponseEntity<List<ProductDTO>> getBySupplierId(
-            @PathVariable Integer supplierId) {
-
-        return ResponseEntity.ok(
-                productService.getProductsBySupplierId(supplierId));
-    }
+   
 
     // ================= FILTER BY CATEGORY =================
     @GetMapping("/category/{category}")

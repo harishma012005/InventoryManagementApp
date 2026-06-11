@@ -89,12 +89,5 @@ public class SupplierController {
     }
 
     // TOTAL STOCK
-    @GetMapping("/totalStock/{id}")
-    public ResponseEntity<Map<String, Object>> getTotalStock(@PathVariable Integer id) {
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("totalStock", supplierService.getTotalStockBySupplier(id));
-
-        return ResponseEntity.ok(response);
-    }
+   
 }

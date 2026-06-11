@@ -33,6 +33,37 @@ public class SalesServiceImpl implements SalesService {
 
     @Autowired
     private ProductRepository productRepository;
+    private SalesResponseDTO convertToResponseDTO(Sales sales) {
+
+        List<SalesItemDTO> items = new ArrayList<>();
+
+        for (SalesItem item : sales.getItems()) {
+
+            SalesItemDTO dto = new SalesItemDTO();
+
+            dto.setProductName(item.getProduct().getProductName());
+            dto.setQuantity(item.getQuantity());
+            dto.setPrice(item.getPrice());
+
+            dto.setTotalPrice(
+                    item.getPrice().multiply(
+                            BigDecimal.valueOf(item.getQuantity())
+                    )
+            );
+
+            items.add(dto);
+        }
+
+        SalesResponseDTO response = new SalesResponseDTO();
+
+        response.setSalesId(sales.getSalesId());
+        response.setUserName(sales.getUser().getFullName());
+        response.setTotalAmount(sales.getTotalAmount());
+        response.setItems(items);
+        response.setSalesDate(sales.getSalesDate());
+
+        return response;
+    }
 
     // ================= CREATE SALES =================
     @Override
@@ -179,6 +210,16 @@ public class SalesServiceImpl implements SalesService {
         response.setSalesDate(sales.getSalesDate());
 
         return response;
+    }
+    @Override
+    public List<SalesResponseDTO> getMySales(Integer userId) {
+
+        List<Sales> salesList =
+                salesRepository.findByUser_UserId(userId);
+
+        return salesList.stream()
+                .map(this::convertToResponseDTO)
+                .toList();
     }
 
     // ================= DELETE =================

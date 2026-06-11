@@ -1,6 +1,10 @@
 package com.inventorymanagement.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.inventorymanagement.entity.User;
+import com.inventorymanagement.repository.UserRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +26,8 @@ public class SalesController {
 
     @Autowired
     private SalesService salesService;
+    @Autowired
+    private UserRepository userRepository;
     
     // ================= CREATE SALES =================
     @PostMapping("/create")
@@ -37,7 +43,28 @@ public class SalesController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+    @GetMapping("/my-sales")
+    public ResponseEntity<Map<String, Object>> getMySales() {
 
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<SalesResponseDTO> salesList =
+                salesService.getMySales(user.getUserId());
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("status", 200);
+        response.put("message", "My sales fetched successfully");
+        response.put("data", salesList);
+
+        return ResponseEntity.ok(response);
+    }
     // ================= GET ALL SALES =================
     @GetMapping("/all")
     public ResponseEntity<Map<String, Object>> getAllSales() {

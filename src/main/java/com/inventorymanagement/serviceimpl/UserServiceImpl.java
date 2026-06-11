@@ -3,6 +3,7 @@ package com.inventorymanagement.serviceimpl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.inventorymanagement.dto.ChangePasswordDTO;
@@ -17,7 +18,8 @@ import com.inventorymanagement.service.UserService;
 @Service
 public class UserServiceImpl implements UserService {
 
-
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;	
 @Autowired
 private UserRepository userRepository;
 
@@ -30,7 +32,7 @@ private UserDTO convertToDTO(User user) {
     dto.setFullName(user.getFullName());
     dto.setEmail(user.getEmail());
     dto.setPhone(user.getPhone());
-    dto.setRole(user.getRole());
+    dto.setRole("USER");
 
     return dto;
 }
@@ -42,45 +44,30 @@ private User convertToEntity(RegisterUserDTO dto) {
 
     user.setFullName(dto.getFullName());
     user.setEmail(dto.getEmail());
-    user.setPassword(dto.getPassword());
+    user.setPassword(
+            passwordEncoder.encode(dto.getPassword())
+    );
     user.setPhone(dto.getPhone());
-    user.setRole(dto.getRole());
+    user.setRole("USER");
 
     return user;
 }
 
 // Register User
 @Override
-public UserDTO saveUser(
-        RegisterUserDTO registerUserDTO) {
+public UserDTO saveUser(RegisterUserDTO registerUserDTO) {
 
-    User user =
-            convertToEntity(registerUserDTO);
-
-    if (userRepository.existsByEmail(
-            user.getEmail())) {
-
-        throw new RuntimeException(
-                "Email Already Exists");
+    if (userRepository.existsByEmail(registerUserDTO.getEmail())) {
+        throw new RuntimeException("Email Already Exists");
     }
 
-    if (userRepository.existsByPhone(
-            user.getPhone())) {
-
-        throw new RuntimeException(
-                "Phone Number Already Exists");
+    if (userRepository.existsByPhone(registerUserDTO.getPhone())) {
+        throw new RuntimeException("Phone Number Already Exists");
     }
+    User user =convertToEntity(registerUserDTO );
+   
 
-    if (user.getRole() == null ||
-            user.getRole().isBlank()) {
-
-        user.setRole("USER");
-    }
-
-    User savedUser =
-            userRepository.save(user);
-
-    return convertToDTO(savedUser);
+    return convertToDTO(userRepository.save(user));
 }
 
 // Get All Users
@@ -168,26 +155,18 @@ public List<UserDTO> searchUsersByName(
 
 // Login
 @Override
-public UserDTO login(
-        LoginDTO loginDTO) {
+public UserDTO login(LoginDTO loginDTO) {
 
-    User user =
-            userRepository.findByEmail(
-                    loginDTO.getEmail())
-            .orElseThrow(() ->
-                    new RuntimeException(
-                            "Invalid Email"));
+    User user = userRepository.findByEmail(loginDTO.getEmail())
+            .orElseThrow(() -> new RuntimeException("Invalid Email"));
 
-    if (!user.getPassword()
-            .equals(loginDTO.getPassword())) {
-
-        throw new RuntimeException(
-                "Invalid Password");
+    // ✅ FIX HERE
+    if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+        throw new RuntimeException("Invalid Password");
     }
 
     return convertToDTO(user);
 }
-
 // Change Password
 @Override
 public String changePassword(

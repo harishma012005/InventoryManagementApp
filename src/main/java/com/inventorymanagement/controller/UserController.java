@@ -27,20 +27,20 @@ private UserService userService;
 
 
 // Register User
-@PostMapping({"/register","/save"})
-public ResponseEntity<UserDTO> saveUser(
+//@PostMapping({"/register","/save"})
+//public ResponseEntity<UserDTO> saveUser(
 
-        @Valid
-        @RequestBody RegisterUserDTO registerUserDTO) {
+  //      @Valid
+    //    @RequestBody RegisterUserDTO registerUserDTO) {
 
-    UserDTO savedUser =
-            userService.saveUser(
-                    registerUserDTO);
+    //UserDTO savedUser =
+      //      userService.saveUser(
+        //            registerUserDTO);
 
-    return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(savedUser);
-}
+    //return ResponseEntity
+      //      .status(HttpStatus.CREATED)
+        //    .body(savedUser);
+//}
 
 // Get All Users
 @GetMapping("/all")
@@ -113,16 +113,16 @@ searchUsers(
 }
 
 // Login
-@PostMapping("/login")
-public ResponseEntity<UserDTO>
-login(
+//@PostMapping("/login")
+//public ResponseEntity<UserDTO>
+//login(
 
-        @RequestBody LoginDTO loginDTO) {
+  //      @RequestBody LoginDTO loginDTO) {
 
-    return ResponseEntity.ok(
-            userService.login(
-                    loginDTO));
-}
+ //   return ResponseEntity.ok(
+   //         userService.login(
+     //               loginDTO));
+//}
 
 // Change Password
 @PutMapping("/change-password/{id}")

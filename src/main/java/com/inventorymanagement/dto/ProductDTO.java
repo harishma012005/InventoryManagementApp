@@ -7,7 +7,7 @@ public class ProductDTO {
     private Integer productId;
     private String productName;
     private String categoryName;
-    private String supplierName;
+  
     private Integer quantity;
     private BigDecimal price;
 
@@ -40,13 +40,7 @@ public class ProductDTO {
         this.categoryName = categoryName;
     }
 
-    public String getSupplierName() {
-        return supplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
-    }
+  
 
     public Integer getQuantity() {
         return quantity;

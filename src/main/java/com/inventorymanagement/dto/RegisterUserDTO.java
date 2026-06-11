@@ -10,7 +10,7 @@ public class RegisterUserDTO {
 
     private String phone;
 
-    private String role;
+//    private String role;
 
     public RegisterUserDTO() {
     }
@@ -51,12 +51,12 @@ public class RegisterUserDTO {
         this.phone = phone;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(
-            String role) {
-        this.role = role;
-    }
+//    public String getRole() {
+//        return role;
+//    }
+//
+//    public void setRole(
+//            String role) {
+//        this.role = role;
+//    }
 }

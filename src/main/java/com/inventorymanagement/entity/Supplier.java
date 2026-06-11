@@ -34,14 +34,7 @@ public class Supplier {
     private String address;
 
     // 🔥 IMPORTANT RELATIONSHIP FIX
-    @OneToMany(
-            mappedBy = "supplier",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
-    @JsonIgnore
-    private List<Product> products;
+   
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -93,13 +86,6 @@ public class Supplier {
         this.address = address;
     }
 
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

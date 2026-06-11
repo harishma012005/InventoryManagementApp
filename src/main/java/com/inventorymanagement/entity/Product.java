@@ -31,9 +31,6 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne
-    @JoinColumn(name = "supplier_id")
-    private Supplier supplier;
 
     @NotNull
     @Min(0)
@@ -105,15 +102,6 @@ public class Product {
         this.price = price;
     }
 
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(
-            Supplier supplier) {
-
-        this.supplier = supplier;
-    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

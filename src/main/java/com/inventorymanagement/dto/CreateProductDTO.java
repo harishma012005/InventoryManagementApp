@@ -14,7 +14,7 @@ public class CreateProductDTO {
 
     private Integer categoryId;
 
-    private Integer supplierId;
+    
 
     public CreateProductDTO() {
     }
@@ -59,11 +59,5 @@ public class CreateProductDTO {
         this.categoryId = categoryId;
     }
 
-    public Integer getSupplierId() {
-        return supplierId;
-    }
-
-    public void setSupplierId(Integer supplierId) {
-        this.supplierId = supplierId;
-    }
+   
 }

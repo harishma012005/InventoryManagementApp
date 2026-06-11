@@ -20,8 +20,7 @@ public class SupplierServiceImpl implements SupplierService {
     @Autowired
     private SupplierRepository supplierRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+ 
 
     // ENTITY → DTO
     private SupplierDTO convertToDTO(Supplier supplier) {
@@ -118,18 +117,5 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     // TOTAL STOCK
-    @Override
-    public Integer getTotalStockBySupplier(Integer supplierId) {
-
-        supplierRepository.findById(supplierId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Supplier Not Found With ID: " + supplierId));
-
-        List<Product> products =
-                productRepository.findBySupplier_SupplierId(supplierId);
-
-        return products.stream()
-                .mapToInt(Product::getQuantity)
-                .sum();
-    }
+  
 }

@@ -18,5 +18,4 @@ public interface SupplierService {
 
     void deleteAllSuppliers();
 
-    Integer getTotalStockBySupplier(Integer supplierId);
 }

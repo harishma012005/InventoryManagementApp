@@ -18,4 +18,5 @@ public interface SalesService {
 
     // ================= DELETE SALES =================
     void deleteSales(Integer id);
+    List<SalesResponseDTO> getMySales(Integer userId);
 }

@@ -22,4 +22,5 @@ public interface UserRepository
     List<User> findByFullNameContainingIgnoreCase(
             String fullName);
     List<User> findByRole(String role);
+    
    }
