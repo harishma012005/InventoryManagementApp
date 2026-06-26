@@ -29,4 +29,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     boolean existsByProductNameAndCategory_CategoryId(
             String productName,
             Integer categoryId);
+    long countByQuantityLessThanEqual(Integer quantity);
+
+    long countByQuantity(Integer quantity);
 }

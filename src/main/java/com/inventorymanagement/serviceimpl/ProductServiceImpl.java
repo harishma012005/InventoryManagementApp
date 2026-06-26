@@ -17,7 +17,10 @@ import com.inventorymanagement.dto.ProductDTO;
 import com.inventorymanagement.dto.CreateProductDTO;
 import com.inventorymanagement.entity.Category;
 import com.inventorymanagement.entity.Supplier;
-
+import com.inventorymanagement.dto.CreateNotificationDTO;
+import com.inventorymanagement.entity.User;
+import com.inventorymanagement.repository.UserRepository;
+import com.inventorymanagement.service.NotificationService;
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -27,7 +30,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private NotificationService notificationService;
 
+    @Autowired
+    private UserRepository userRepository;
    
     private ProductDTO convertToDTO(Product product) {
 
@@ -67,6 +74,43 @@ public class ProductServiceImpl implements ProductService {
        
         return product;
     }
+    private User getAdminUser() {
+
+        return userRepository.findByRole("ADMIN")
+                .stream()
+                .findFirst()
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Admin Not Found"));
+    }
+    private void checkLowStock(Product product) {
+
+        if (product.getQuantity() <= 10) {
+
+            User admin = getAdminUser();
+
+            CreateNotificationDTO notification =
+                    new CreateNotificationDTO();
+
+            notification.setUserId(
+                    admin.getUserId());
+
+            notification.setTitle(
+                    "LOW STOCK ALERT");
+
+            notification.setMessage(
+                    product.getProductName()
+                    + " stock is low. Remaining quantity: "
+                    + product.getQuantity());
+
+            notification.setType(
+                    "LOW_STOCK");
+
+            notificationService
+                    .createNotification(
+                            notification);
+        }
+    }
     
     // Save Product
     @Override
@@ -93,6 +137,7 @@ public class ProductServiceImpl implements ProductService {
         Product savedProduct =
                 productRepository.save(
                         product);
+        checkLowStock(savedProduct);
 
         return convertToDTO(
                 savedProduct);
@@ -159,6 +204,7 @@ public class ProductServiceImpl implements ProductService {
         Product updatedProduct =
                 productRepository.save(
                         existingProduct);
+        checkLowStock(updatedProduct);
 
         return convertToDTO(
                 updatedProduct);

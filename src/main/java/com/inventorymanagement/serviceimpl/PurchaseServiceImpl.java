@@ -6,7 +6,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.inventorymanagement.dto.CreateNotificationDTO;
+import com.inventorymanagement.entity.User;
+import com.inventorymanagement.repository.UserRepository;
+import com.inventorymanagement.service.NotificationService;
 import com.inventorymanagement.dto.CreatePurchaseDTO;
 import com.inventorymanagement.dto.CreatePurchaseItemDTO;
 import com.inventorymanagement.dto.PurchaseDTO;
@@ -34,6 +37,11 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private UserRepository userRepository;
     private PurchaseDTO convertToDTO(Purchase purchase) {
 
         PurchaseDTO dto = new PurchaseDTO();
@@ -65,7 +73,15 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         return dto;
     }
+    private User getAdminUser() {
 
+        return userRepository.findByRole("ADMIN")
+                .stream()
+                .findFirst()
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Admin Not Found"));
+    }
     // ================= CREATE PURCHASE =================
     @Override
     public PurchaseResponseDTO createPurchase(CreatePurchaseDTO dto) {
@@ -131,6 +147,28 @@ public class PurchaseServiceImpl implements PurchaseService {
         purchase.setTotalAmount(totalAmount);
 
         Purchase saved = purchaseRepository.save(purchase);
+        User admin = getAdminUser();
+
+        CreateNotificationDTO notification =
+                new CreateNotificationDTO();
+
+        notification.setUserId(
+                admin.getUserId());
+
+        notification.setTitle(
+                "PURCHASE CREATED");
+
+        notification.setMessage(
+                "Purchase #"
+                + saved.getPurchaseId()
+                + " created successfully. Stock has been updated.");
+
+        notification.setType(
+                "PURCHASE");
+
+        notificationService
+                .createNotification(
+                        notification);
 
         // 4. RESPONSE DTO (ONLY SIMPLE OUTPUT)
         PurchaseResponseDTO response = new PurchaseResponseDTO();

@@ -67,6 +67,8 @@ public class SecurityConfig {
                 	    // ADMIN only create/update/delete
                 	    .requestMatchers("/products/**")
                 	    .hasRole("ADMIN")
+                	    .requestMatchers("/reports/**")
+                	    .hasRole("ADMIN")
 
                 	    // ================= CATEGORY =================
 
@@ -94,7 +96,12 @@ public class SecurityConfig {
                 	    .hasRole("ADMIN")
 
                 	    // ================= STOCK =================
+                	    .requestMatchers("/dashboard/**")
+                	    .hasRole("ADMIN")
+                	 // ================= HOME =================
 
+                	    .requestMatchers("/home/**")
+                	    .hasAnyRole("ADMIN", "USER")
                 	    .requestMatchers("/stock/**")
                 	    .hasRole("ADMIN")
 
@@ -120,12 +127,191 @@ public class SecurityConfig {
                 	    // ADMIN see sale by id
                 	    .requestMatchers("/sales/get/**")
                 	    .hasRole("ADMIN")
+                	 // ================= CART =================
 
+                	 // USER can manage own cart
+                	 .requestMatchers("/cart/**")
+                	 .hasRole("USER")
                 	    // ADMIN delete sales
                 	    .requestMatchers("/sales/delete/**")
                 	    .hasRole("ADMIN")
+                	 // ================= ORDERS =================
 
-                	    .anyRequest().authenticated()
+                	 // USER
+
+                	 .requestMatchers(
+                	         HttpMethod.POST,
+                	         "/orders/buy-now")
+                	 .hasRole("USER")
+
+                	 .requestMatchers(
+                	         HttpMethod.POST,
+                	         "/orders/place-from-cart")
+                	 .hasRole("USER")
+
+                	 .requestMatchers(
+                	         "/orders/my-orders")
+                	 .hasRole("USER")
+
+                	 .requestMatchers(
+                	         HttpMethod.PUT,
+                	         "/orders/cancel/**")
+                	 .hasRole("USER")
+
+                	 // ADMIN
+
+                	 .requestMatchers(
+                	         "/orders/all")
+                	 .hasRole("ADMIN")
+
+                	 .requestMatchers(
+                	         "/orders/get/**")
+                	 .hasRole("ADMIN")
+
+                	 .requestMatchers(
+                	         HttpMethod.DELETE,
+                	         "/orders/delete/**")
+                	 .hasRole("ADMIN")
+                	// ================= PAYMENTS =================
+
+                	// USER can make payment
+                	.requestMatchers(
+                	        HttpMethod.POST,
+                	        "/payments/pay")
+                	.hasRole("USER")
+
+                	// USER can view own payments
+                	.requestMatchers(
+                	        "/payments/my-payments")
+                	.hasRole("USER")
+
+                	// ADMIN can view all payments
+                	.requestMatchers(
+                	        "/payments/all")
+                	.hasRole("ADMIN")
+
+                	// ADMIN can refund payment
+                	.requestMatchers(
+                	        "/payments/refund/**")
+                	.hasRole("ADMIN")
+
+                	// ADMIN can delete payment
+                	.requestMatchers(
+                	        HttpMethod.DELETE,
+                	        "/payments/**")
+                	.hasRole("ADMIN")
+
+                	// ADMIN can filter payments
+                	.requestMatchers(
+                	        "/payments/status/**")
+                	.hasRole("ADMIN")
+
+                	// ADMIN can view payment details
+                	.requestMatchers(
+                	        "/payments/order/**",
+                	        "/payments/**")
+                	.hasRole("ADMIN")
+                	// ================= REFUND =================
+
+                	.requestMatchers(
+                	        HttpMethod.POST,
+                	        "/refunds/request")
+                	.hasRole("USER")
+
+                	.requestMatchers(
+                	        HttpMethod.GET,
+                	        "/refunds/my-refunds")
+                	.hasRole("USER")
+
+                	.requestMatchers(
+                	        HttpMethod.GET,
+                	        "/refunds/*")
+                	.hasAnyRole(
+                	                "USER",
+                	                "ADMIN")
+
+                	.requestMatchers(
+                	        HttpMethod.GET,
+                	        "/refunds/all")
+                	.hasRole("ADMIN")
+
+                	.requestMatchers(
+                	        HttpMethod.GET,
+                	        "/refunds/status/**")
+                	.hasRole("ADMIN")
+
+                	.requestMatchers(
+                	        HttpMethod.PUT,
+                	        "/refunds/approve/**")
+                	.hasRole("ADMIN")
+
+                	.requestMatchers(
+                	        HttpMethod.PUT,
+                	        "/refunds/reject/**")
+                	.hasRole("ADMIN")
+
+                	.requestMatchers(
+                	        HttpMethod.DELETE,
+                	        "/refunds/**")
+                	.hasRole("ADMIN")
+                	// ================= PROFILE =================
+
+                	.requestMatchers(
+                	        "/profile/me")
+                	.hasAnyRole(
+                	        "USER",
+                	        "ADMIN")
+
+                	.requestMatchers(
+                	        "/profile/update")
+                	.hasAnyRole(
+                	        "USER",
+                	        "ADMIN")
+
+                	.requestMatchers(
+                	        "/profile/change-password")
+                	.hasAnyRole(
+                	        "USER",
+                	        "ADMIN")
+                	// ================= SUPPORT =================
+
+                	// USER
+
+                	.requestMatchers(
+                	        HttpMethod.POST,
+                	        "/support/create")
+                	.hasRole("USER")
+
+                	.requestMatchers(
+                	        "/support/my-tickets",
+                	        "/support/my-ticket/**")
+                	.hasRole("USER")
+
+                	// ADMIN
+
+                	.requestMatchers(
+                	        "/support/all",
+                	        "/support/status/**",
+                	        "/support/priority/**")
+                	.hasRole("ADMIN")
+
+                	.requestMatchers(
+                	        HttpMethod.PUT,
+                	        "/support/reply/**",
+                	        "/support/status/**")
+                	.hasRole("ADMIN")
+
+                	.requestMatchers(
+                	        HttpMethod.DELETE,
+                	        "/support/**")
+                	.hasRole("ADMIN")
+
+                	.requestMatchers(
+                	        "/support/**")
+                	.hasRole("ADMIN")
+                	.anyRequest()
+                	.authenticated()
+                	
                 	)
                 // 🔐 Stateless session (VERY IMPORTANT)
                 .sessionManagement(session ->
