@@ -1,6 +1,11 @@
 package com.inventorymanagement.controller;
 
 import java.util.HashMap;
+import java.io.IOException;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +17,12 @@ import com.inventorymanagement.dto.BuyNowDTO;
 import com.inventorymanagement.dto.OrderDTO;
 import com.inventorymanagement.dto.OrderResponseDTO;
 import com.inventorymanagement.service.OrderService;
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.inventorymanagement.dto.UpdateOrderStatusDTO;
+import com.inventorymanagement.dto.OrderStatusResponseDTO;
 
 @RestController
 @RequestMapping("/orders")
@@ -64,7 +75,36 @@ public class OrderController {
         return ResponseEntity.ok(
                 orderService.getOrderById(orderId));
     }
+    @PutMapping("/update-status/{orderId}")
+    public ResponseEntity<OrderStatusResponseDTO> updateOrderStatus(
 
+            @PathVariable Integer orderId,
+
+            @RequestBody UpdateOrderStatusDTO dto) {
+
+        return ResponseEntity.ok(
+
+                orderService.updateOrderStatus(
+                        orderId,
+                        dto));
+    }
+    @GetMapping("/filter")
+    public ResponseEntity<List<OrderDTO>> filterOrdersByDate(
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate from,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate to) {
+
+        return ResponseEntity.ok(
+
+                orderService.filterOrdersByDate(
+                        from,
+                        to));
+    }
     // ================= CANCEL =================
 
     @PutMapping("/cancel/{orderId}")
@@ -91,5 +131,23 @@ public class OrderController {
                 "Order Deleted Successfully");
 
         return ResponseEntity.ok(response);
+    }
+ // ================= DOWNLOAD INVOICE =================
+
+    @GetMapping("/invoice/{orderId}")
+    public ResponseEntity<byte[]> downloadInvoice(
+            @PathVariable Integer orderId)
+            throws IOException {
+
+        byte[] invoice =
+                orderService.downloadInvoice(orderId);
+
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=Invoice_" + orderId + ".pdf")
+                .contentType(
+                        MediaType.APPLICATION_PDF)
+                .body(invoice);
     }
 }

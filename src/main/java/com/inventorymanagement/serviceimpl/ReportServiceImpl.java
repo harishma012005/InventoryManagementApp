@@ -22,7 +22,10 @@ import com.inventorymanagement.repository.ProductRepository;
 import com.inventorymanagement.repository.PurchaseRepository;
 import com.inventorymanagement.repository.RefundRepository;
 import com.inventorymanagement.service.ReportService;
+import java.io.IOException;
 
+import com.inventorymanagement.util.ExcelGenerator;
+import com.inventorymanagement.util.PdfGenerator;
 @Service
 public class ReportServiceImpl implements ReportService {
 
@@ -233,6 +236,66 @@ private PurchaseReportDTO convertPurchaseDTO(
 
     return dto;
 }
+@Override
+public byte[] exportInventoryReportPdf() throws IOException {
 
+    return PdfGenerator.generateInventoryReport(
+            getInventoryReport());
+}
+@Override
+public byte[] exportInventoryReportExcel() throws IOException {
+
+    return ExcelGenerator.generateInventoryReport(
+            getInventoryReport());
+}
+
+@Override
+public byte[] exportSalesReportPdf() throws IOException {
+
+    throw new UnsupportedOperationException(
+            "Sales PDF Export Not Implemented Yet");
+}
+@Override
+public byte[] exportSalesReportExcel() throws IOException {
+
+    throw new UnsupportedOperationException(
+            "Sales Excel Export Not Implemented Yet");
+}
+@Override
+public byte[] exportPurchaseReportPdf() throws IOException {
+
+    throw new UnsupportedOperationException(
+            "Purchase PDF Export Not Implemented Yet");
+}
+@Override
+public byte[] exportPurchaseReportExcel() throws IOException {
+
+    throw new UnsupportedOperationException(
+            "Purchase Excel Export Not Implemented Yet");
+}
+@Override
+public byte[] exportPaymentReportPdf() throws IOException {
+
+    throw new UnsupportedOperationException(
+            "Payment PDF Export Not Implemented Yet");
+}
+@Override
+public byte[] exportPaymentReportExcel() throws IOException {
+
+    throw new UnsupportedOperationException(
+            "Payment Excel Export Not Implemented Yet");
+}
+@Override
+public byte[] exportRefundReportPdf() throws IOException {
+
+    throw new UnsupportedOperationException(
+            "Refund PDF Export Not Implemented Yet");
+}
+@Override
+public byte[] exportRefundReportExcel() throws IOException {
+
+    throw new UnsupportedOperationException(
+            "Refund Excel Export Not Implemented Yet");
+}
 }
 

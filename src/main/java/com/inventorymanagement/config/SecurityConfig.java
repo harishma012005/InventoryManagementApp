@@ -63,6 +63,11 @@ public class SecurityConfig {
                 	    // USER + ADMIN can view products
                 	    .requestMatchers(HttpMethod.GET, "/products/**")
                 	    .hasAnyRole("ADMIN", "USER")
+                	    .requestMatchers(
+                	            "/auth/forgot-password",
+                	            "/auth/verify-otp",
+                	            "/auth/reset-password")
+                	    .permitAll()
 
                 	    // ADMIN only create/update/delete
                 	    .requestMatchers("/products/**")
@@ -157,6 +162,15 @@ public class SecurityConfig {
                 	         HttpMethod.PUT,
                 	         "/orders/cancel/**")
                 	 .hasRole("USER")
+                	 .requestMatchers(
+                		        HttpMethod.PUT,
+                		        "/orders/update-status/**")
+                		.hasRole("ADMIN")
+
+                		.requestMatchers(
+                		        HttpMethod.GET,
+                		        "/orders/filter")
+                		.hasRole("ADMIN")
 
                 	 // ADMIN
 
@@ -305,7 +319,10 @@ public class SecurityConfig {
                 	        HttpMethod.DELETE,
                 	        "/support/**")
                 	.hasRole("ADMIN")
-
+                	.requestMatchers(
+                	        HttpMethod.GET,
+                	        "/orders/invoice/**")
+                	.hasAnyRole("USER", "ADMIN")     
                 	.requestMatchers(
                 	        "/support/**")
                 	.hasRole("ADMIN")

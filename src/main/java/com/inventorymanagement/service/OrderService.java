@@ -1,10 +1,15 @@
 package com.inventorymanagement.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.inventorymanagement.dto.BuyNowDTO;
 import com.inventorymanagement.dto.OrderDTO;
 import com.inventorymanagement.dto.OrderResponseDTO;
+import com.inventorymanagement.dto.OrderStatusResponseDTO;
+import com.inventorymanagement.dto.UpdateOrderStatusDTO;
+
+import io.jsonwebtoken.io.IOException;
 
 public interface OrderService {
 
@@ -27,4 +32,15 @@ public interface OrderService {
 
     // Admin Delete
     void deleteOrder(Integer orderId);
+
+ // Admin Update Order Status
+    OrderStatusResponseDTO updateOrderStatus(
+            Integer orderId,
+            UpdateOrderStatusDTO dto);
+
+    // Admin Filter Orders By Date
+    List<OrderDTO> filterOrdersByDate(
+            LocalDate from,
+            LocalDate to);
+    byte[] downloadInvoice(Integer orderId) throws IOException;
 }
